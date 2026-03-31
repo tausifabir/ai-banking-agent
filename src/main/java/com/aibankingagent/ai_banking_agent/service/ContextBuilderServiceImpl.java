@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class ContextBuilderService implements ContextBuilder {
+public class ContextBuilderServiceImpl implements ContextBuilder {
 
     @Override
     public String buildContext(List<LoanScheme> loans) {

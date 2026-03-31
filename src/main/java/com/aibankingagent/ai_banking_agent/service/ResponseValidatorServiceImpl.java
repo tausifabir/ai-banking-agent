@@ -3,7 +3,7 @@ package com.aibankingagent.ai_banking_agent.service;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ResponseValidatorService implements ResponseValidator {
+public class ResponseValidatorServiceImpl implements ResponseValidator {
     @Override
     public String validate(String response) {
         if (response == null || response.isBlank()) {

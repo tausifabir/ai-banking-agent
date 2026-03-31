@@ -3,7 +3,7 @@ package com.aibankingagent.ai_banking_agent.service;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PromptBuilderService implements PromptBuilder {
+public class PromptBuilderServiceImpl implements PromptBuilder {
     @Override
     public String build(String context, String question) {
         return """
@@ -21,6 +21,7 @@ public class PromptBuilderService implements PromptBuilder {
                             RULES:
                             - Do NOT add extra info
                             - If not found say: NOT_FOUND
+                            - Max 5 lines
                             ---------------------
                             Give a clear and helpful answer.
                         """.formatted(context, question);

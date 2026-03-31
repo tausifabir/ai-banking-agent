@@ -3,10 +3,8 @@ package com.aibankingagent.ai_banking_agent.service;
 import com.aibankingagent.ai_banking_agent.entity.LoanScheme;
 import com.aibankingagent.ai_banking_agent.helper.QuerySignal;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class AiServiceImpl implements AiService {
@@ -16,14 +14,14 @@ public class AiServiceImpl implements AiService {
     private final ContextBuilder  contextBuilder;
     private final RetrieverService  retrieverService;
     private final SignalExtractorService  signalExtractorService;
-    private final ResponseValidatorService  responseValidatorService;
+    private final ResponseValidatorServiceImpl responseValidatorService;
 
     public AiServiceImpl(LlmClient llmClient,
                          PromptBuilder promptBuilder,
                          ContextBuilder contextBuilder,
                          RetrieverService retrieverService,
                          SignalExtractorService signalExtractorService,
-                         ResponseValidatorService responseValidatorService) {
+                         ResponseValidatorServiceImpl responseValidatorService) {
         this.llmClient = llmClient;
         this.promptBuilder = promptBuilder;
         this.contextBuilder = contextBuilder;

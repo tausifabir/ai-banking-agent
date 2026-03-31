@@ -6,7 +6,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.Map;
 
 @Service
-public class LlmClientService implements LlmClient {
+public class LlmClientServiceImpl implements LlmClient {
 
     private final WebClient webClient = WebClient.builder()
             .baseUrl("http://localhost:11434")
