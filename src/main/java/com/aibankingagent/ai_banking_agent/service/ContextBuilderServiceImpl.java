@@ -16,6 +16,13 @@ public class ContextBuilderServiceImpl implements ContextBuilder {
                 .collect(Collectors.joining("\n"));
     }
 
+    @Override
+    public String buildFromPdf(List<String> chunks) {
+        return chunks.stream()
+                .map(this::cleanChunk)
+                .collect(Collectors.joining("\n---\n"));
+    }
+
     private String format(LoanScheme l) {
         return String.format(
                 "%s | %s-%s BDT | %s | %s",
@@ -35,4 +42,15 @@ public class ContextBuilderServiceImpl implements ContextBuilder {
         if (d == null) return "";
         return d.length() > 40 ? d.substring(0, 40) + "..." : d;
     }
+
+    private String cleanChunk(String chunk) {
+
+        if (chunk == null) return "";
+
+        return chunk
+                .replaceAll("\\s+", " ")   // remove noise
+                .trim()
+                .substring(0, Math.min(chunk.length(), 300)); // limit size 🔥
+    }
+
 }

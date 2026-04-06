@@ -16,8 +16,8 @@ public class LlmClientServiceImpl implements LlmClient {
     public String call(String prompt) {
 
         Map<String, Object> request = Map.of(
-                "model", "llama3",
-//                "model", "llama3.1",
+//                "model", "llama3",
+                "model", "llama3.1",
 //                "model", "dolphin3",
                 "prompt", prompt,
                 "stream", false

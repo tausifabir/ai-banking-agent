@@ -7,4 +7,7 @@ import java.util.List;
 public interface ContextBuilder {
 
     String buildContext(List<LoanScheme> loans);
+
+    String buildFromPdf(List<String> chunks);
+
 }

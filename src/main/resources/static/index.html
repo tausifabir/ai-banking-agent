@@ -1,294 +1,27 @@
-<!--<!DOCTYPE html>-->
-<!--<html>-->
-<!--<head>-->
-<!--    <title>Bank AI Assistant</title>-->
-
-<!--    <style>-->
-<!--        body {-->
-<!--            margin: 0;-->
-<!--            font-family: "Segoe UI", sans-serif;-->
-<!--            background: #f0f2f5;-->
-<!--            display: flex;-->
-<!--            justify-content: center;-->
-<!--            align-items: center;-->
-<!--            height: 100vh;-->
-<!--        }-->
-
-<!--        .chat-container {-->
-<!--            width: 420px;-->
-<!--            height: 650px;-->
-<!--            background: white;-->
-<!--            border-radius: 16px;-->
-<!--            display: flex;-->
-<!--            flex-direction: column;-->
-<!--            box-shadow: 0 10px 30px rgba(0,0,0,0.1);-->
-<!--            overflow: hidden;-->
-<!--        }-->
-
-<!--        .header {-->
-<!--            background: #0a66c2;-->
-<!--            color: white;-->
-<!--            padding: 15px;-->
-<!--            font-size: 18px;-->
-<!--            font-weight: bold;-->
-<!--        }-->
-
-<!--        .chat-box {-->
-<!--            flex: 1;-->
-<!--            padding: 15px;-->
-<!--            overflow-y: auto;-->
-<!--            display: flex;-->
-<!--            flex-direction: column;-->
-<!--            gap: 10px;-->
-<!--        }-->
-
-<!--        .message {-->
-<!--            max-width: 75%;-->
-<!--            padding: 10px 14px;-->
-<!--            border-radius: 12px;-->
-<!--            font-size: 14px;-->
-<!--            line-height: 1.4;-->
-<!--        }-->
-
-<!--        .user {-->
-<!--            align-self: flex-end;-->
-<!--            background: #0a66c2;-->
-<!--            color: white;-->
-<!--            border-bottom-right-radius: 4px;-->
-<!--        }-->
-
-<!--        .bot {-->
-<!--            align-self: flex-start;-->
-<!--            background: #e4e6eb;-->
-<!--            color: black;-->
-<!--            border-bottom-left-radius: 4px;-->
-<!--        }-->
-
-<!--        .controls {-->
-<!--            padding: 10px;-->
-<!--            border-top: 1px solid #ddd;-->
-<!--            background: #fafafa;-->
-<!--        }-->
-
-<!--        .actions {-->
-<!--            display: flex;-->
-<!--            gap: 8px;-->
-<!--            margin-bottom: 8px;-->
-<!--        }-->
-
-<!--        .actions button {-->
-<!--            flex: 1;-->
-<!--            border: none;-->
-<!--            background: #eef3ff;-->
-<!--            color: #0a66c2;-->
-<!--            padding: 8px;-->
-<!--            border-radius: 8px;-->
-<!--            cursor: pointer;-->
-<!--            font-size: 13px;-->
-<!--            transition: 0.2s;-->
-<!--        }-->
-
-<!--        .actions button:hover {-->
-<!--            background: #dce7ff;-->
-<!--        }-->
-
-<!--        .input-row {-->
-<!--            display: flex;-->
-<!--            gap: 8px;-->
-<!--        }-->
-
-<!--        input {-->
-<!--            flex: 1;-->
-<!--            padding: 10px;-->
-<!--            border-radius: 20px;-->
-<!--            border: 1px solid #ccc;-->
-<!--            outline: none;-->
-<!--        }-->
-
-<!--        button.send {-->
-<!--            background: #0a66c2;-->
-<!--            color: white;-->
-<!--            border: none;-->
-<!--            padding: 10px 14px;-->
-<!--            border-radius: 20px;-->
-<!--            cursor: pointer;-->
-<!--        }-->
-
-<!--        select {-->
-<!--            width: 100%;-->
-<!--            margin-bottom: 8px;-->
-<!--            padding: 8px;-->
-<!--            border-radius: 8px;-->
-<!--            border: 1px solid #ccc;-->
-<!--        }-->
-
-<!--        .typing {-->
-<!--            font-size: 12px;-->
-<!--            color: gray;-->
-<!--        }-->
-
-<!--    </style>-->
-<!--</head>-->
-
-<!--<body>-->
-
-<!--<div class="chat-container">-->
-
-<!--    <div class="header">-->
-<!--        🏦 Bank AI Assistant-->
-<!--    </div>-->
-
-<!--    <div id="chatBox" class="chat-box"></div>-->
-
-<!--    <div class="controls">-->
-
-<!--        &lt;!&ndash; Quick Actions &ndash;&gt;-->
-<!--        <div class="actions">-->
-<!--            <button onclick="quickAction('loan')">Loan</button>-->
-<!--            <button onclick="quickAction('account')">Account</button>-->
-<!--            <button onclick="quickAction('interest')">Interest</button>-->
-<!--        </div>-->
-
-<!--        &lt;!&ndash; Loan Dropdown &ndash;&gt;-->
-<!--        <select id="loanDropdown" onchange="selectLoan()">-->
-<!--            <option value="">Select Loan Type</option>-->
-<!--            <option value="Personal Loan">Personal Loan</option>-->
-<!--            <option value="AGAMI Personal Loan">AGAMI Personal Loan</option>-->
-<!--            <option value="Home Loan">Home Loan</option>-->
-<!--            <option value="TARA Uddokta SME Loan">TARA Uddokta SME Loan</option>-->
-<!--            <option value="SME Loan">SME Loan</option>-->
-<!--        </select>-->
-
-<!--        &lt;!&ndash; Input &ndash;&gt;-->
-<!--        <div class="input-row">-->
-<!--            <input id="message" placeholder="Type your message..." onkeypress="handleKey(event)" />-->
-<!--            <button class="send" onclick="sendMessage()">➤</button>-->
-<!--        </div>-->
-
-<!--    </div>-->
-
-<!--</div>-->
-
-<!--<script>-->
-
-<!--    function addMessage(type, text) {-->
-<!--        const chatBox = document.getElementById("chatBox");-->
-
-<!--        const div = document.createElement("div");-->
-<!--        div.className = "message " + type;-->
-<!--        div.innerText = text;-->
-
-<!--        chatBox.appendChild(div);-->
-<!--        chatBox.scrollTop = chatBox.scrollHeight;-->
-<!--    }-->
-
-<!--    // Enter key support-->
-<!--    function handleKey(event) {-->
-<!--        if (event.key === "Enter") {-->
-<!--            sendMessage();-->
-<!--        }-->
-<!--    }-->
-
-<!--    // Quick actions-->
-<!--    function quickAction(type) {-->
-
-<!--        if (type === "loan") {-->
-<!--            addMessage("bot", "Please select a loan from dropdown 👇");-->
-<!--            return;-->
-<!--        }-->
-
-<!--        sendToBackend(type);-->
-<!--    }-->
-
-<!--    // Dropdown selection-->
-<!--    function selectLoan() {-->
-<!--        const loan = document.getElementById("loanDropdown").value;-->
-
-<!--        if (loan) {-->
-<!--            addMessage("user", loan);-->
-<!--            sendToBackend(loan);-->
-<!--        }-->
-<!--    }-->
-
-<!--    // Send typed message-->
-<!--    function sendMessage() {-->
-
-<!--        const input = document.getElementById("message");-->
-<!--        const message = input.value.trim();-->
-
-<!--        if (!message) return;-->
-
-<!--        addMessage("user", message);-->
-<!--        input.value = "";-->
-
-<!--        sendToBackend(message);-->
-<!--    }-->
-
-<!--    // API call-->
-<!--    function sendToBackend(message) {-->
-
-<!--        addTyping();-->
-
-<!--        fetch("/api/chat", {-->
-<!--            method: "POST",-->
-<!--            headers: {-->
-<!--                "Content-Type": "application/json"-->
-<!--            },-->
-<!--            body: JSON.stringify({ message: message })-->
-<!--        })-->
-<!--            .then(res => res.text())-->
-<!--            .then(data => {-->
-<!--                removeTyping();-->
-<!--                addMessage("bot", data);-->
-<!--            });-->
-<!--    }-->
-
-<!--    // Typing indicator-->
-<!--    function addTyping() {-->
-<!--        const chatBox = document.getElementById("chatBox");-->
-
-<!--        const div = document.createElement("div");-->
-<!--        div.id = "typing";-->
-<!--        div.className = "typing";-->
-<!--        div.innerText = "Bot is typing...";-->
-
-<!--        chatBox.appendChild(div);-->
-<!--    }-->
-
-<!--    function removeTyping() {-->
-<!--        const typing = document.getElementById("typing");-->
-<!--        if (typing) typing.remove();-->
-<!--    }-->
-
-<!--</script>-->
-
-<!--</body>-->
-<!--</html>-->
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bank AI Assistant</title>
+    <title>AI Banking Assistant</title>
 
     <style>
         :root {
             --primary: #0a66c2;
-            --bg: #f5f7fb;
-            --bot: #eef2f7;
-            --user: #0a66c2;
+            --bg: #f6f8fc;
+            --card: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
         }
 
-        * { box-sizing: border-box; }
-
+        /* Base */
         body {
             margin: 0;
-            font-family: "Segoe UI", sans-serif;
+            font-family: "Inter", "Segoe UI", sans-serif;
             background: var(--bg);
         }
 
+        /* Layout */
         .app {
             display: flex;
             height: 100vh;
@@ -296,106 +29,137 @@
 
         /* Sidebar */
         .sidebar {
-            width: 260px;
-            background: white;
-            border-right: 1px solid #ddd;
+            width: 240px;
+            background: var(--card);
+            border-right: 1px solid #eee;
             padding: 20px;
         }
 
         .sidebar h3 {
-            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--text);
         }
 
         .sidebar button {
             width: 100%;
-            margin-bottom: 10px;
             padding: 10px;
+            margin-bottom: 10px;
             border: none;
             border-radius: 8px;
-            background: #eef3ff;
+            background: #f1f5f9;
             cursor: pointer;
+            transition: 0.2s;
         }
 
-        /* Main Chat */
+        .sidebar button:hover {
+            background: #e2e8f0;
+        }
+
+        .sidebar select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        /* Main */
         .main {
             flex: 1;
             display: flex;
             flex-direction: column;
         }
 
+        /* Header */
         .header {
             background: var(--primary);
             color: white;
-            padding: 15px;
-            font-weight: bold;
+            padding: 14px 20px;
+            font-weight: 600;
         }
 
-        .chat-box {
+        /* Chat */
+        .chat {
             flex: 1;
-            padding: 20px;
             overflow-y: auto;
+            padding: 30px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 14px;
         }
 
-        .message {
-            max-width: 60%;
-            padding: 10px 14px;
-            border-radius: 12px;
+        /* Message */
+        .msg {
+            max-width: 65%;
+            padding: 12px 16px;
+            border-radius: 14px;
             font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
 
         .user {
             align-self: flex-end;
-            background: var(--user);
+            background: var(--primary);
             color: white;
         }
 
         .bot {
             align-self: flex-start;
-            background: var(--bot);
-        }
-
-        /* Footer */
-        .footer {
-            padding: 10px;
             background: white;
-            border-top: 1px solid #ddd;
         }
 
-        .input-row {
+        /* Input area */
+        .input-area {
+            background: white;
+            padding: 12px;
+            border-top: 1px solid #eee;
+        }
+
+        .input-box {
             display: flex;
+            align-items: center;
             gap: 10px;
+            background: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: 25px;
         }
 
+        /* Input */
         input {
             flex: 1;
-            padding: 12px;
-            border-radius: 20px;
-            border: 1px solid #ccc;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
         }
 
-        button.send {
+        /* Buttons */
+        .send-btn {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 16px;
+            padding: 8px 14px;
             border-radius: 20px;
             cursor: pointer;
         }
 
-        select {
-            width: 100%;
-            margin-bottom: 10px;
-            padding: 8px;
+        .upload-btn {
+            cursor: pointer;
+            font-size: 18px;
         }
 
+        /* Typing */
         .typing {
             font-size: 12px;
-            color: gray;
+            color: var(--muted);
         }
 
+        /* File name */
+        .file-name {
+            font-size: 12px;
+            color: var(--muted);
+            margin-left: 10px;
+        }
     </style>
 </head>
 
@@ -405,18 +169,17 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <h3>🏦 Menu</h3>
+        <h3>🏦 Banking</h3>
+
         <button onclick="quick('loan')">Loan Info</button>
-        <button onclick="quick('account')">Account Opening</button>
+        <button onclick="quick('account')">Open Account</button>
         <button onclick="quick('interest')">Interest Rate</button>
 
         <h4>Loans</h4>
         <select onchange="selectLoan(this.value)">
             <option value="">Select Loan</option>
             <option>Personal Loan</option>
-            <option>AGAMI Personal Loan</option>
             <option>Home Loan</option>
-            <option>TARA Uddokta SME Loan</option>
             <option>SME Loan</option>
         </select>
     </div>
@@ -426,16 +189,25 @@
 
         <div class="header">AI Banking Assistant</div>
 
-        <div id="chat" class="chat-box"></div>
+        <div id="chat" class="chat"></div>
 
-        <div class="footer">
-            <div class="input-row">
-                <input id="msg" placeholder="Ask something..." onkeypress="enter(event)" />
-                <button class="send" onclick="send()">Send</button>
+        <div class="input-area">
+
+            <div class="input-box">
+
+                <span class="upload-btn" onclick="openFile()">📎</span>
+                <input id="msg" placeholder="Ask anything or upload..." onkeypress="enter(event)" />
+                <button class="send-btn" onclick="send()">Send</button>
+
+                <input type="file" id="fileInput" hidden accept=".pdf,image/*" />
             </div>
+
+            <div id="fileName" class="file-name"></div>
+
         </div>
 
     </div>
+
 </div>
 
 <script>
@@ -443,7 +215,7 @@
     function add(type, text) {
         const chat = document.getElementById("chat");
         const div = document.createElement("div");
-        div.className = "message " + type;
+        div.className = "msg " + type;
         div.innerText = text;
         chat.appendChild(div);
         chat.scrollTop = chat.scrollHeight;
@@ -454,10 +226,6 @@
     }
 
     function quick(type) {
-        if (type === "loan") {
-            add("bot", "Select a loan from the left menu.");
-            return;
-        }
         sendToBackend(type);
     }
 
@@ -467,28 +235,60 @@
         sendToBackend(val);
     }
 
-    function send() {
-        const input = document.getElementById("msg");
-        const text = input.value.trim();
-        if (!text) return;
-        add("user", text);
-        input.value = "";
-        sendToBackend(text);
+    function openFile() {
+        document.getElementById("fileInput").click();
     }
 
-    function sendToBackend(message) {
+    document.getElementById("fileInput").addEventListener("change", function () {
+        const file = this.files[0];
+        document.getElementById("fileName").innerText = file ? file.name : "";
+    });
+
+    function send() {
+
+        const input = document.getElementById("msg");
+        const fileInput = document.getElementById("fileInput");
+
+        const text = input.value.trim();
+        const file = fileInput.files[0];
+
+        if (!text && !file) return;
+
+        if (file && file.size > 5 * 1024 * 1024) {
+            add("bot", "File must be under 5MB.");
+            return;
+        }
+
+        if (text) add("user", text);
+        if (file) add("user", "📎 " + file.name);
+
+        input.value = "";
+        fileInput.value = "";
+        document.getElementById("fileName").innerText = "";
+
+        sendToBackend(text, file);
+    }
+
+    function sendToBackend(message, file) {
 
         addTyping();
 
+        const formData = new FormData();
+        if (message) formData.append("message", message);
+        if (file) formData.append("file", file);
+
         fetch("/api/chat", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message })
+            body: formData
         })
             .then(res => res.text())
             .then(data => {
                 removeTyping();
                 add("bot", data);
+            })
+            .catch(() => {
+                removeTyping();
+                add("bot", "Error occurred.");
             });
     }
 

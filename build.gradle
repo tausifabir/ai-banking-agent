@@ -31,6 +31,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'net.sourceforge.tess4j:tess4j:5.12.0'
+    // Main PDFBox library
+    implementation 'org.apache.pdfbox:pdfbox:2.0.30'
+
+    // Optional: Add for advanced layout and graphics support
+    // implementation 'org.apache.pdfbox:fontbox:3.0.3'
 //	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
