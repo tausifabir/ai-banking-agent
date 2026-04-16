@@ -36,7 +36,7 @@ public class ChatController {
             return "Sorry, I cannot access or provide personal banking information.";
         }
 
-//        // 📄 If file uploaded
+        // 📄 If file uploaded
         if (file != null && !file.isEmpty()) {
             return aiService.processFile(message, file);
         }

@@ -1,10 +1,13 @@
 package com.aibankingagent.ai_banking_agent.service;
 
+import com.aibankingagent.ai_banking_agent.entity.DocumentChunk;
 import com.aibankingagent.ai_banking_agent.entity.LoanScheme;
 import com.aibankingagent.ai_banking_agent.helper.QuerySignal;
+import com.aibankingagent.ai_banking_agent.repository.DocumentChunkRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,6 +21,7 @@ public class AiServiceImpl implements AiService {
     private final PromptBuilder  promptBuilder;
     private final ContextBuilder  contextBuilder;
     private final RetrieverService  retrieverService;
+    private final DocumentChunkRepository documentChunkRepository;
     private final SignalExtractorService  signalExtractorService;
     private final ResponseValidatorServiceImpl responseValidatorService;
 
@@ -28,7 +32,7 @@ public class AiServiceImpl implements AiService {
                          PdfService pdfService,
                          PromptBuilder promptBuilder,
                          ContextBuilder contextBuilder,
-                         RetrieverService retrieverService,
+                         RetrieverService retrieverService, DocumentChunkRepository documentChunkRepository,
                          SignalExtractorService signalExtractorService,
                          ResponseValidatorServiceImpl responseValidatorService) {
         this.llmClient = llmClient;
@@ -39,6 +43,7 @@ public class AiServiceImpl implements AiService {
         this.promptBuilder = promptBuilder;
         this.contextBuilder = contextBuilder;
         this.retrieverService = retrieverService;
+        this.documentChunkRepository = documentChunkRepository;
         this.signalExtractorService = signalExtractorService;
         this.responseValidatorService = responseValidatorService;
     }
@@ -46,6 +51,9 @@ public class AiServiceImpl implements AiService {
 
     @Override
     public String generateResponse(String message) {
+
+        message = message.replaceAll("\\s+", " ").trim();
+
         // 1. Extract signal
         QuerySignal signal = this.signalExtractorService.signalExtractor(message);
 
@@ -56,20 +64,40 @@ public class AiServiceImpl implements AiService {
         // 2. Retrieve (RAG)
         List<LoanScheme> loans = this.retrieverService.retrieve(signal, message);
 
-/*        if (loans.isEmpty()) {
-            return "Sorry, no matching loan found.";
-        }*/
+        // 2. chunk
+        List<String> chunks = new ArrayList<>();
 
-        // 3. Build context
-        String context = this.contextBuilder.buildContext(loans);
+        // 3. Retrieve (signal + keyword)
+        List<String> relevant = pdfRetriever.retrieveFromChunks(chunks, message, signal);
 
-        // 4. Build prompt
-        String prompt = this.promptBuilder.build(context, message);
+        // 4. Build context from chunk
+        String chunkContext = contextBuilder.buildFromPdf(relevant);
 
-        // 5. Call LLM
+        // 5. Build context from loan info
+        String loanContext = this.contextBuilder.buildContext(loans);
+
+
+        StringBuilder context = new StringBuilder();
+
+        if (chunkContext != null && !chunkContext.isBlank()) {
+            context.append("📄 DOCUMENT DATA:\n")
+                    .append(chunkContext)
+                    .append("\n\n");
+        }
+
+        if (loanContext != null && !loanContext.isBlank()) {
+            context.append("🏦 LOAN DATA:\n")
+                    .append(loanContext);
+        }
+
+
+        // 6. Build prompt
+        String prompt = this.promptBuilder.build(String.valueOf(context), message);
+
+        // 7. Call LLM
         try {
             String rawResponse = this.llmClient.call(prompt);
-            // 6. Validate
+            // 8. Validate
             return this.responseValidatorService.validate(rawResponse);
         } catch (Exception e) {
             return fallbackResponse();
@@ -79,6 +107,8 @@ public class AiServiceImpl implements AiService {
 
     @Override
     public String processFile(String message, MultipartFile file) {
+
+        message = message.replaceAll("\\s+", " ").trim();
 
         this.validateFile(file);
 
@@ -98,7 +128,20 @@ public class AiServiceImpl implements AiService {
         QuerySignal signal = this.signalExtractorService.signalExtractor(message);
 
         // 2. chunk
-        List<String> chunks = chunker.chunk(extractedText);
+        List<String> chunks = new ArrayList<>();
+
+        if(extractedText != null) {
+            chunks = chunker.chunk(extractedText);
+            // ✅ SAVE to DB
+            for (String c : chunks) {
+                DocumentChunk dc = new DocumentChunk();
+                dc.setContent(c);
+                dc.setSource(file.getOriginalFilename());
+                dc.setType(contentType);
+                this.documentChunkRepository.save(dc);
+            }
+        }
+
 
         // 3. Retrieve (signal + keyword)
         List<String> relevant = pdfRetriever.retrieveFromChunks(chunks, message, signal);
