@@ -32,7 +32,7 @@ public class AiServiceImpl implements AiService {
                          PdfService pdfService,
                          PromptBuilder promptBuilder,
                          ContextBuilder contextBuilder,
-                         RetrieverService retrieverService, DocumentChunkRepository documentChunkRepository,
+                         RetrieverService retrieverService,
                          SignalExtractorService signalExtractorService,
                          ResponseValidatorServiceImpl responseValidatorService) {
         this.llmClient = llmClient;
