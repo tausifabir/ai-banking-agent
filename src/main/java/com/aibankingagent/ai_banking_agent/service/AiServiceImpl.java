@@ -113,7 +113,6 @@ public class AiServiceImpl implements AiService {
 
         this.validateFile(file);
 
-
         String contentType = file.getContentType();
 
         String extractedText;
