@@ -95,6 +95,8 @@
             font-size: 14px;
             line-height: 1.4;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            word-break: break-word;
+            white-space: pre-wrap;
         }
 
         .user {
@@ -106,6 +108,44 @@
         .bot {
             align-self: flex-start;
             background: white;
+        }
+
+        .thinking {
+            align-self: flex-start;
+            background: #eef2f7;
+            color: #4b5563;
+            font-style: italic;
+            font-size: 13px;
+            max-width: 70%;
+        }
+
+        .tool {
+            align-self: flex-start;
+            background: #f5f3ff;
+            border-left: 3px solid #7c3aed;
+            color: #1f2937;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 12.5px;
+            max-width: 75%;
+        }
+
+        .tool .name {
+            color: #5b21b6;
+            font-weight: 600;
+        }
+
+        .tool .result {
+            display: block;
+            margin-top: 6px;
+            color: #374151;
+            white-space: pre-wrap;
+        }
+
+        .error {
+            align-self: flex-start;
+            background: #fef2f2;
+            color: #991b1b;
+            border-left: 3px solid #dc2626;
         }
 
         /* Input area */
@@ -219,6 +259,68 @@
         div.innerText = text;
         chat.appendChild(div);
         chat.scrollTop = chat.scrollHeight;
+        return div;
+    }
+
+    function addHTML(type, html) {
+        const chat = document.getElementById("chat");
+        const div = document.createElement("div");
+        div.className = "msg " + type;
+        div.innerHTML = html;
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+        return div;
+    }
+
+    function formatArgs(args) {
+        if (!args || typeof args !== "object") return "";
+        const parts = [];
+        for (const k of Object.keys(args)) {
+            parts.push(k + "=" + JSON.stringify(args[k]));
+        }
+        return parts.join(", ");
+    }
+
+    function renderResponse(data) {
+        // Thinking + tool calls come before the final answer so the user
+        // sees the agent's reasoning trail.
+        if (Array.isArray(data.steps)) {
+            for (const step of data.steps) {
+                if (step && step.thinking && step.thinking.trim()) {
+                    add("thinking", "💭 " + step.thinking.trim());
+                }
+                if (Array.isArray(step && step.toolCalls)) {
+                    for (const call of step.toolCalls) {
+                        const name = call && call.name ? call.name : "unknown";
+                        const args = formatArgs(call && call.arguments);
+                        const head = "🔧 " + name + (args ? "(" + args + ")" : "");
+                        const result = call && call.result != null
+                                ? String(call.result).trim()
+                                : "";
+                        addHTML("tool",
+                            "<span class=\"name\">" + escapeHtml(head) + "</span>"
+                            + (result
+                                ? "<span class=\"result\">→ " + escapeHtml(result) + "</span>"
+                                : ""));
+                    }
+                }
+            }
+        }
+        if (data && data.error) {
+            add("error", "⚠ " + data.error);
+        }
+        if (data && data.answer && data.answer.trim()) {
+            add("bot", data.answer);
+        } else if (!data || (!data.answer && !data.error)) {
+            add("bot", "(no response)");
+        }
+    }
+
+    function escapeHtml(s) {
+        return String(s)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
     }
 
     function enter(e) {
@@ -226,13 +328,13 @@
     }
 
     function quick(type) {
-        sendToBackend(type);
+        sendToBackend(type, null);
     }
 
     function selectLoan(val) {
         if (!val) return;
         add("user", val);
-        sendToBackend(val);
+        sendToBackend(val, null);
     }
 
     function openFile() {
@@ -260,7 +362,7 @@
         }
 
         if (text) add("user", text);
-        if (file) add("user", "📎 " + file.name);
+        if (file) add("user", "� " + file.name);
 
         input.value = "";
         fileInput.value = "";
@@ -273,22 +375,42 @@
 
         addTyping();
 
-        const formData = new FormData();
-        if (message) formData.append("message", message);
-        if (file) formData.append("file", file);
+        // File present -> multipart /api/chat/upload.
+        // Plain text  -> JSON /api/chat.
+        const endpoint = file ? "/api/chat/upload" : "/api/chat";
+        const init = file
+            ? (() => {
+                const fd = new FormData();
+                if (message) fd.append("message", message);
+                fd.append("file", file);
+                return { method: "POST", body: fd };
+            })()
+            : {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: message || "" })
+            };
 
-        fetch("/api/chat", {
-            method: "POST",
-            body: formData
-        })
-            .then(res => res.text())
+        fetch(endpoint, init)
+            .then(async res => {
+                const ctype = res.headers.get("content-type") || "";
+                const isJson = ctype.includes("application/json");
+                const payload = isJson ? await res.json() : await res.text();
+                if (!res.ok) {
+                    const msg = (isJson && payload && payload.message)
+                        ? payload.message
+                        : ("Request failed: " + res.status);
+                    throw new Error(msg);
+                }
+                return payload;
+            })
             .then(data => {
                 removeTyping();
-                add("bot", data);
+                renderResponse(data || {});
             })
-            .catch(() => {
+            .catch(err => {
                 removeTyping();
-                add("bot", "Error occurred.");
+                add("error", "⚠ " + (err && err.message ? err.message : "Error occurred."));
             });
     }
 
